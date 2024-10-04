@@ -1,0 +1,16 @@
+ais_access_token:
+  object_type: pipeline
+  object_uuid: bw_access_token
+  outdated_after:
+    seconds: 3500
+  repo_path: /home/src/default_repo
+  settings:
+    get_ais_access_token: {}
+bw_api_access_token:
+  object_type: pipeline
+  object_uuid: bw_api_access_token
+  outdated_after:
+    seconds: 3499
+  repo_path: /home/src/default_repo
+  settings:
+    get_bw_api_access_token: {}
