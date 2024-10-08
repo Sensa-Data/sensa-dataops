@@ -9,7 +9,7 @@ blocks:
   language: python
   name: get_ais_access_token
   retry_config: null
-  status: executed
+  status: updated
   timeout: null
   type: data_loader
   upstream_blocks: []
