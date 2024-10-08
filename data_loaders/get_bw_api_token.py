@@ -1,12 +1,10 @@
-import io
-import pandas as pd
 import requests
-import time
 
 if 'data_loader' not in globals():
     from mage_ai.data_preparation.decorators import data_loader
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
+
 from mage_ai.data_preparation.shared.secrets import get_secret_value
 
 
@@ -22,17 +20,18 @@ def load_data_from_api(*args, **kwargs):
         "Content-Type": "application/x-www-form-urlencoded"
     }
     data = {
-        "client_id": get_secret_value('ais_client_id'),
-        "scope": "ais",
-        "client_secret": get_secret_value('ais_client_secret'),
-        "grant_type": "client_credentials"
-    }
-
-    response = requests.post(url, headers=headers, data=data).json()
+    "client_id": get_secret_value('bw_api_client_id'),
+    "scope": "api",
+    "client_secret": get_secret_value('bw_api_client_secret'),
+    "grant_type": "client_credentials"
+}
+    response = requests.post(url, headers=headers, data=data)
+    token_data = response.json()
     
-    return response['access_token']
+    return token_data['access_token']
 
-    
+    #return response.json()
+    #pd.read_csv(io.StringIO(response.text), sep=',')
 
 #test
 
@@ -42,3 +41,4 @@ def test_output(output, *args) -> None:
     Template code for testing the output of the block.
     """
     assert output is not None, 'The output is undefined'
+

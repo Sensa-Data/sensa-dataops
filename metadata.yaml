@@ -55,4 +55,5 @@ notification_config:
 project_uuid: 31930f12c37a467e9d97db6a238065f7
 features:
   custom_design: true
+  command_center: true
 pipelines:
