@@ -14,9 +14,6 @@ DB = {
         "bucket": "AIS data"
 }
 
-print(get_secret_value('sdm_customer_id'))
-print(get_secret_value('sdm_customer_key'))
-
 @data_exporter
 def export_data(data, *args, **kwargs):
     """

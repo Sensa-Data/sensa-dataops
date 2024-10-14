@@ -12,12 +12,12 @@ blocks:
   language: python
   name: get_ais_token
   retry_config: null
-  status: not_executed
+  status: executed
   timeout: null
   type: global_data_product
   upstream_blocks: []
   uuid: get_ais_token
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks:
@@ -28,7 +28,7 @@ blocks:
   language: python
   name: load_ais_data
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: data_loader
   upstream_blocks:
@@ -38,7 +38,7 @@ blocks:
   color: null
   configuration:
     global_data_product:
-      uuid: bw_api_access_token
+      uuid: bw_api_access_token_gdp
   downstream_blocks:
   - enrich_with_wave_data
   executor_config: null
@@ -63,7 +63,7 @@ blocks:
   language: python
   name: enrich_with_wave_data
   retry_config: null
-  status: updated
+  status: failed
   timeout: null
   type: transformer
   upstream_blocks:
@@ -115,7 +115,11 @@ executor_count: 1
 executor_type: null
 extensions: {}
 name: ais_wave_data_product
-notification_config: {}
+notification_config:
+  alert_on:
+  - trigger_failure
+  teams_config:
+    webhook_url: https://sensadata.webhook.office.com/webhookb2/3ff2e042-04bb-466b-bf40-11c9f9a8dc79@03b3464b-b3a9-4ca6-8ee6-689e41e70cbb/IncomingWebhook/2d1a3b1044274c4895f5c04db23237a4/4bfac518-9651-47ea-aa03-c97ad2b5e941/V2hgz37oR4IBa8VFxKonoG0hI5NZrhwUmIhlnlBu5vsvs1
 remote_variables_dir: null
 retry_config: {}
 run_pipeline_in_one_process: false

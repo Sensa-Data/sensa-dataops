@@ -36,6 +36,7 @@ async def process_df(df: pd.DataFrame, headers):
         results = await asyncio.gather(*tasks)  # Await all tasks concurrently
         for result in results:
             wave_col.append(result)
+    return wave_col
 
 
 @transformer
