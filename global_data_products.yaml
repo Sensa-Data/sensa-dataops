@@ -6,7 +6,7 @@ ais_access_token:
   repo_path: /home/src/default_repo
   settings:
     get_ais_access_token: {}
-bw_api_access_token:
+bw_api_access_token_gdp:
   object_type: pipeline
   object_uuid: bw_api_access_token
   outdated_after:

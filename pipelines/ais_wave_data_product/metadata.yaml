@@ -12,12 +12,12 @@ blocks:
   language: python
   name: get_ais_token
   retry_config: null
-  status: not_executed
+  status: executed
   timeout: null
   type: global_data_product
   upstream_blocks: []
   uuid: get_ais_token
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks:
@@ -28,7 +28,7 @@ blocks:
   language: python
   name: load_ais_data
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: data_loader
   upstream_blocks:
@@ -38,7 +38,7 @@ blocks:
   color: null
   configuration:
     global_data_product:
-      uuid: bw_api_access_token
+      uuid: bw_api_access_token_gdp
   downstream_blocks:
   - enrich_with_wave_data
   executor_config: null
@@ -63,7 +63,7 @@ blocks:
   language: python
   name: enrich_with_wave_data
   retry_config: null
-  status: updated
+  status: failed
   timeout: null
   type: transformer
   upstream_blocks:
