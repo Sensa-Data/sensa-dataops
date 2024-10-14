@@ -36,6 +36,7 @@ async def process_df(df: pd.DataFrame, headers):
         results = await asyncio.gather(*tasks)  # Await all tasks concurrently
         for result in results:
             wave_col.append(result)
+    return wave_col
 
 
 @transformer
@@ -48,10 +49,6 @@ def transform(token: dict, df: pd.DataFrame, *args, **kwargs):
     Returns:
         Input data frame enriched with wave data
     """
-    print(token)
-    #df = df.head(100)
-    #token = token["get_bw_api_access_token"]
-    #token = token[0]
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "Authorization": f"Bearer {token}",
