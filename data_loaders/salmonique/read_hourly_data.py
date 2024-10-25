@@ -3,67 +3,72 @@ if 'data_loader' not in globals():
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 from mage_ai.data_preparation.shared.secrets import get_secret_value
+
 from datetime import datetime, timedelta
 from influxdb_client_3 import InfluxDBClient3
 import pandas as pd
 
 host = get_secret_value('influx_host')
-org = get_secret_value('influx_salmonique_org')
-token = get_secret_value('influx_salmonique_token')
-source_bucket = 'aggregate_salmonique_long'
+org = get_secret_value('influx_org')
+token = get_secret_value('influx_token')
 
+measurements=["WaterQuality", "feedingsystem"]
+#tags=["aggregation"]
+bucket = 'biofish_raw'
 
 @data_loader
 def load_data(*args, **kwargs):
     """
-    Read minute data from salmonique long
+    Read raw data from biofish_min
 
     Returns:
-        tuple(minute data, tags)
+        tuple(dataframe, tags)
     """
     schedule_time = kwargs.get('execution_date')
+    bucket = 'biofish_raw'
     stop_time = datetime.fromisoformat(str(schedule_time)).replace(tzinfo=None)
-    trigger_interval = kwargs.get('trigger_interval' , None)
-    if trigger_interval is None or trigger_interval.startswith('var'):
-        raise Exception("Set trigger Interval")
-    if trigger_interval =='hour':
-        start_time = stop_time - timedelta(hours=1)
-    elif trigger_interval =='day':
-        start_time = stop_time - timedelta(days=1)
-    else:
-        raise Exception("trigger_interval can be hour or day only")
+    start_time = stop_time - timedelta(minutes=1)
     tags = []
-    with InfluxDBClient3(
+    for measurement in measurements:
+        with InfluxDBClient3(
             host=host,
             org=org,
             token=token,
-            database=source_bucket
+            database=bucket
         ) as client:
             query = f'''
                 SELECT *
-                FROM "{source_bucket}"
+                FROM "{measurement}"
                 WHERE
                 time >= '{start_time}'
                 AND time <= '{stop_time}'
             '''
             query_str_singleline = ' '.join(line.strip() for line in query.splitlines())
-            print(f"Query on salmonique_long: \"{query_str_singleline.strip()}\"")
+            print(f"Query on {bucket}: \"{query_str_singleline.strip()}\"")
             table = client.query(query, language="influxql")
-            table = table.drop("iox::measurement")
+            df = table.to_pandas()
+            table = table.drop_columns(["iox::measurement", "Quality", "host", "id"])
+            
+            # These columns are empty in the 'feedingsystem' measurement (starting from 08/11-2023 and going forwards)
+            if measurement == "feedingsystem":
+                table = table.drop_columns(["Sensor", "Tank"])
 
             if table.num_rows < 1:
                 print(f"Query: \"{query_str_singleline.strip()}\" returned empty table.")
                 raise Exception(f"Query: \"{query_str_singleline.strip()}\" returned empty table.")
 
             # Get list of tags
-            tags = []
+            measurement_tags = []
             for column in table.schema:
                 if column.metadata[b"iox::column::type"].endswith(b"tag"):
-                    tags.append(column.name)
+                    measurement_tags.append(column.name)
+            measurement_tags.append("Origin")
+            tags.append(measurement_tags)
+
             df = table.to_pandas()
-    return df, tags
+            df["Origin"] = measurement
 
-
+        return df, tags
 @test
 def test_output(output, *args) -> None:
     """
