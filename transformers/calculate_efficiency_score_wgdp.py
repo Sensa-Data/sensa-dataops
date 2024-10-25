@@ -10,6 +10,8 @@ def transform(data, *args, **kwargs):
     ...
     """
     df = pd.DataFrame(data)
+    #Remove rows where Wave_height is Nove
+    df = df[df['Wave_height'].notna()]
     df['fuelEfficencyScore']=df['speedOverGround']*df['Wave_height']
     
     return df
