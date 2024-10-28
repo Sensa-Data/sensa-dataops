@@ -9,7 +9,9 @@ blocks:
   has_callback: false
   language: python
   name: get_bw_ais_token
-  retry_config: null
+  retry_config:
+    delay: 5
+    retries: 3
   status: executed
   timeout: null
   type: data_loader
@@ -26,7 +28,7 @@ blocks:
   language: python
   name: load_ais_data_wgdp
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: data_loader
   upstream_blocks:
@@ -48,7 +50,7 @@ blocks:
   type: data_loader
   upstream_blocks: []
   uuid: get_bw_api_token
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks:
@@ -59,14 +61,14 @@ blocks:
   language: python
   name: enrich_with_wave_data_wgdp
   retry_config: null
-  status: updated
+  status: executed
   timeout: null
   type: transformer
   upstream_blocks:
   - get_bw_api_token
   - load_ais_data_wgdp
   uuid: enrich_with_wave_data_wgdp
-- all_upstream_blocks_executed: false
+- all_upstream_blocks_executed: true
   color: null
   configuration: {}
   downstream_blocks:

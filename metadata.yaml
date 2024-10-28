@@ -52,6 +52,16 @@ notification_config:
     webhook_url: "{{ env_var('MAGE_SLACK_WEBHOOK_URL') }}"
   teams_config:
     webhook_url: "{{ env_var('MAGE_TEAMS_WEBHOOK_URL') }}"
+retry_config:
+  # Number of retry times
+  retries: 3
+  # Initial delay (in seconds) before retry. If exponential_backoff is true,
+  # the delay time is multiplied by 2 for the next retry
+  delay: 5
+  # Maximum time between the first attempt and the last retry
+  max_delay: 60
+  # Whether to use exponential backoff retry
+  exponential_backoff: true
 project_uuid: 31930f12c37a467e9d97db6a238065f7
 features:
   custom_design: true
