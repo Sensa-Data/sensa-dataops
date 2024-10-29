@@ -3,6 +3,7 @@ if 'transformer' not in globals():
 if 'test' not in globals():
     from mage_ai.data_preparation.decorators import test
 import pandas as pd
+import numpy as np
 
 @transformer
 def transform(data, *args, **kwargs):
@@ -10,8 +11,9 @@ def transform(data, *args, **kwargs):
     ...
     """
     df = pd.DataFrame(data)
-    df['fuelEfficencyScore']=df['speedOverGround']*df['Wave_height']
-    
+    df['speedOverGround'] = np.where((df['speedOverGround'].isna()) | (df['speedOverGround'] == 0), 1, df['speedOverGround'])
+    df['Wave_height'] = np.where((df['Wave_height'].isna()) | (df['Wave_height'] == 0), 1, df['Wave_height'])
+    df['fuelEfficencyScore'] = df['speedOverGround'] * df['Wave_height']
     return df
 
 
