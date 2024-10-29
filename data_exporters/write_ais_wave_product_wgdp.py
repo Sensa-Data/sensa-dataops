@@ -6,7 +6,7 @@ from mage_ai.data_preparation.shared.secrets import get_secret_value
 if 'data_exporter' not in globals():
     from mage_ai.data_preparation.decorators import data_exporter
 
-url = "https://api.sensadata.io/ingest/"
+url = "https://demo.sensa.no/api/ingest/"
 
 DB = {
         "customer_id": get_secret_value('sdm_customer_id'),
