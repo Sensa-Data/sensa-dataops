@@ -9,7 +9,9 @@ blocks:
   has_callback: false
   language: python
   name: get_bw_ais_token
-  retry_config: null
+  retry_config:
+    delay: 5
+    retries: 3
   status: executed
   timeout: null
   type: data_loader
