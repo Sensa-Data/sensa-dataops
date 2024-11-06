@@ -7,18 +7,21 @@ import pandas as pd
 @transformer
 def transform(data, *args, **kwargs):
     """
-    Downsample raw sensor data by minute
+    Template code for a transformer block.
+
+    Add more parameters to this function if this block has multiple parent blocks.
+    There should be one parameter for each output variable from each parent block.
 
     Args:
-        data: minute raw data and tags
+        data: The output from the upstream parent block
         args: The output from any additional upstream blocks (if applicable)
 
     Returns:
-        tuple(dataframe, tags)
+        tuple(downsampled minute data, tags)
     """
     # Specify your transformation logic here
-    schedule_time = kwargs.get('execution_date')
     aggregated_data = ()
+    schedule_time = kwargs.get('execution_date')
     for measurement in data:
         df = measurement[0]
         tags = measurement[1]
