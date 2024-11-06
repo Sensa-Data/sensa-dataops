@@ -22,22 +22,29 @@ def export_data(data, *args, **kwargs):
         displayed when inspecting the block run.
     """
     # Specify your data exporting logic here
-    org = '72b75494c73e60d1'
-    df = data[0]
-    tags = data[1]
-    target_bucket = 'aggregate_salmonique_long'
+    org = get_secret_value('biofish_long_write_org')
+    target_bucket = 'biofish_long'
+    measurements=["WaterQuality", "feedingsystem"]
+
     with InfluxDBClient3(
         host=get_secret_value('influx_host'),
         org=org,
-        token=get_secret_value('aggregate_token'),
+        token=get_secret_value('biofish_long_token'),
         database=target_bucket
     ) as client:
-        for tag in tags:
+        for idx, measurement_data in enumerate(data):
+
+            df = measurement_data[0]
+            tags = measurement_data[1]
+            measurement = measurements[idx]
+            data_frame_measurement_name = f"biofish_{measurement}_min"
+            
+
             client.write(
                     record=df,
-                    data_frame_measurement_name=target_bucket,
+                    data_frame_measurement_name=data_frame_measurement_name,
                     data_frame_timestamp_column="time",
-                    data_frame_tag_columns=tag
+                    data_frame_tag_columns=tags
             )
 
-    print(f"Wrote {len(df.index)} rows to {target_bucket}")
+            print(f"Wrote {len(df.index)} rows to {target_bucket}")
