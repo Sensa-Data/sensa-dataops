@@ -3,7 +3,7 @@ project_type: standalone
 variables_dir: ~/.mage_data
 # remote_variables_dir: s3://bucket/path_prefix
 
-variables_retention_period: '90d'
+variables_retention_period: '7d'
 
 emr_config:
   # You can customize the EMR cluster instance size with the two parameters
@@ -68,3 +68,5 @@ features:
   command_center: true
   compute_management: false
 pipelines:
+logging_config:
+  retention_period: '7d'
