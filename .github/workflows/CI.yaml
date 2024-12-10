@@ -1,0 +1,46 @@
+name: MageAI Custom Image
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+  workflow_dispatch:
+  
+jobs:
+  build-and-pubsh:
+    name: build and push to ACR
+    env:
+        AZURE_ACR_URL: sensa.azurecr.io
+        AZURE_ACR_REPO: sensa-executor
+    #   IMAGE: sensa.azurecr.io/sensa-executor
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate build ID
+        id: prep
+        run: |
+            branch=${GITHUB_REF##*/}
+            sha=${GITHUB_SHA::8}
+            ts=$(date +%s)
+            # echo "::set-output name=BUILD_ID::${branch}-${sha}-${ts}"
+            echo "::set-output name=BUILD_ID::${branch}
+       
+        # Clone and checkout
+      - uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: azure/docker-login@v2
+        with:
+          login-server: ${{ env.AZURE_ACR_URL }}
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+      
+      - name: Build, tag, and push docker image to Azure ACR
+        env:
+          REGISTRY: ${{ env.AZURE_ACR_URL }}
+          REPOSITORY: ${{ env.AZURE_ACR_REPO }}
+          IMAGE_TAG: ${{ steps.prep.outputs.BUILD_ID }}
+        run: |
+          docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
