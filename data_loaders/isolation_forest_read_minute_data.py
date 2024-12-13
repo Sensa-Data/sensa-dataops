@@ -16,6 +16,7 @@ token = get_secret_value('read_biofish_raw_token')
 measurements=["WaterQuality", "feedingsystem"]
 source_bucket = 'biofish_raw'
 
+
 @data_loader
 def load_data(*args, **kwargs):
     """
@@ -68,8 +69,9 @@ def load_data(*args, **kwargs):
             df["Origin"] = measurement
             rawdata = rawdata + ((df, measurement_tags),)
 
-    # return data
     return rawdata
+
+
 @test
 def test_output(output, *args) -> None:
     """

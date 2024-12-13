@@ -34,12 +34,16 @@ def transform(data, *args, **kwargs):
     aggregated_data = ()
 
     for idx, measurement in enumerate(data):
-        df = measurement[0]
-        tags = measurement[1]
+        df, tags, total_data_count, cleaned_data_count, removed_data_count, *_ = measurement
         measurement_name = measurements[idx]
         measurement_columns = measurements_field_columns.get(measurement_name)
 
-        field_column_unit_aggregation = {}
+        # Following existing Influx table naming patter, e.g. Total_Data_Count
+        field_column_unit_aggregation = {
+            "Total_Data_Count": total_data_count,
+            "Cleaned_Data_Count": cleaned_data_count,
+            "Removed_Data_Count": removed_data_count,
+        }
         field_column_unit_aggregation[TIME_COL] = pd.to_datetime(df[TIME_COL]).mean()
 
         for field_column_name in measurement_columns:

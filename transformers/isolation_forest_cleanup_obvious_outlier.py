@@ -65,35 +65,47 @@ def transform(data, *args, **kwargs):
     Returns:
         Anything (e.g. data frame, dictionary, array, int, str, etc.)
     """
-    # Specify your transformation logic here
+
     logger = kwargs.get('logger')
     measurements=["WaterQuality", "feedingsystem"]
     measurements_models = [WaterQualityModel, FeedingSystemModel]
-    cleand_data = ()
+    cleaned_data = ()
+    
     for idx, measurement in enumerate(data):
         df = measurement[0]
         tags = measurement[1]
         measurement_name = measurements[idx]
         measurement_model = measurements_models[idx]
-        cleand_measurement_data = []
-        print(df.head())
+
+        cleaned_measurement_data = []
+        total_data_count = len(df)
+        removed_data_count = 0
+
         for index, row in df.iterrows():
             try:
                 validated_row = measurement_model(**row)
                 # logger.info(f"Row {index} is valid: {index}")
-                cleand_measurement_data.append(row)
+                cleaned_measurement_data.append(row)
             except ValidationError as e:
                 print(row)
                 # logger.warning(f"Row {index} validation error:\n{e}")
-                pass
+                removed_data_count += 1
         
-        print(len(cleand_measurement_data))
-        cleand_data = cleand_data + ((pd.DataFrame(cleand_measurement_data), tags),)
+        
+        cleaned_data_count = len(cleaned_measurement_data)
+        print(cleaned_data_count)
+        cleaned_data = cleaned_data + (
+            (
+                pd.DataFrame(cleaned_measurement_data), 
+                tags, 
+                total_data_count, 
+                cleaned_data_count, 
+                removed_data_count,
+            ),
+        )
 
-
-    # return cleand_data
-    print(cleand_data)
-    return cleand_data
+    print(cleaned_data)
+    return cleaned_data
 
 
 @test

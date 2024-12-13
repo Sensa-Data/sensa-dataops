@@ -90,7 +90,7 @@ def transform(data, *args, **kwargs):
                 anomaly_scores = trained_model.decision_function(filtered_df_scaled)
 
                 th_filtered_anomaly_scores = anomaly_scores[anomaly_scores > ANOMALY_THRESHOLD]
-                df[f"{OXYGEN_COL}_Anomaly"] = [th_filtered_anomaly_scores.mean()]
+                df[f"{OXYGEN_COL}_Anomaly"] = [th_filtered_anomaly_scores.mean().round(2)]
 
 
             aggregated_data = aggregated_data + ((df, tags),)
