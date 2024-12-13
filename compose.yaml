@@ -10,7 +10,6 @@ services:
     environment:
       USER_CODE_PATH: /home/src/${PROJECT_NAME}
       MAGE_DATABASE_CONNECTION_URL: postgresql+psycopg2://mage:mage@postgres:5432/mage
-      PROJECT_DIR: $(dirname $(pwd))
     ports:
       - 6789:6789
     volumes:
