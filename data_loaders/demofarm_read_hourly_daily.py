@@ -9,7 +9,7 @@ import pandas as pd
 
 #Reading and writing from same bucket
 host = get_secret_value('influx_host')
-org = get_secret_value('demofarm_long_read_org')
+org = get_secret_value('dev_org')
 token = get_secret_value('demofarm_long_read_token')
 bucket = 'demofarm_long'
 measurements=["WaterQuality", "feedingsystem"]

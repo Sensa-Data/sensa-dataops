@@ -20,7 +20,7 @@ def export_data(data, *args, **kwargs):
     """
     # Specify your data exporting logic here
     host = get_secret_value('influx_host')
-    org = get_secret_value('demofarm_long_write_org')
+    org = get_secret_value('dev_org')
     token = get_secret_value('demofarm_long_write_token')
     target_bucket = 'demofarm_long'
     trigger_interval = kwargs.get('trigger_interval' , None)

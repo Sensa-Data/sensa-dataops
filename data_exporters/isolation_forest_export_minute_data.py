@@ -22,7 +22,7 @@ def export_data(data, *args, **kwargs):
         displayed when inspecting the block run.
     """
     # Specify your data exporting logic here
-    org = get_secret_value('demofarm_long_write_org')
+    org = get_secret_value('dev_org')
     target_bucket = 'demofarm_long'
     measurements=["WaterQuality", "feedingsystem"]
 

@@ -10,7 +10,7 @@ import pandas as pd
 import numpy as np
 
 host = get_secret_value('influx_host')
-org = get_secret_value('demofarm_raw_read_org')
+org = get_secret_value('prod_org')
 token = get_secret_value('demofarm_raw_read_token')
 
 measurements=["WaterQuality", "feedingsystem"]
