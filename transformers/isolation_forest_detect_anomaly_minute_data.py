@@ -58,21 +58,20 @@ def transform(data, *args, **kwargs):
         tags = measurement[1]
         measurement_name = measurements[idx]
         measurement_columns = measurements_field_columns.get(measurement_name)
+        anomaly_columns = measurements_anomaly_field_columns.get(measurement_name)
 
         model_path = measurements_trained_model_locations.get(measurement_name)
         trained_model = joblib.load(model_path)
-        
-        if measurement_name == "feedingsystem":
-            aggregated_data = aggregated_data + ((df, tags),)
 
-        elif measurement_name == "WaterQuality":
-            anomaly_cols = [f"{col_name}_Anomaly" for col_name in measurement_columns]
-            df[anomaly_cols] = DEFAULT_ANOMALY_VALUE
+        if trained_model is not None:
+            ANOMALY_COL = anomaly_columns[0]  # for now, we only consider univariate models
+            anomaly_df_cols = [f"{col_name}_Anomaly" for col_name in measurement_columns]
+            df[anomaly_df_cols] = DEFAULT_ANOMALY_VALUE
             
             # batch
             df[TIME_COL] = pd.to_datetime(df[TIME_COL])
-            filtered_df = df.filter([TIME_COL, OXYGEN_COL])
-            # filtered_df.dropna(subset=[OXYGEN_COL], inplace=True)
+            filtered_df = df.filter([TIME_COL, ANOMALY_COL])
+            # filtered_df.dropna(subset=[ANOMALY_COL], inplace=True)
             filtered_df['hour'] = filtered_df[TIME_COL].dt.hour
             filtered_df['day_of_week'] = filtered_df[TIME_COL].dt.dayofweek
             filtered_df.set_index("time", inplace=True)
@@ -86,10 +85,9 @@ def transform(data, *args, **kwargs):
             anomalies = anomaly_labels == -1
             anomaly_scores = trained_model.decision_function(filtered_df_scaled)
 
-            df[f"{OXYGEN_COL}_Anomaly"] = anomaly_scores.round(2)
+            df[f"{ANOMALY_COL}_Anomaly"] = anomaly_scores.round(2)
             aggregated_data = aggregated_data + ((df, tags),)
-
-
+        
             # # single row
             # aggregated_anomaly_rows = []
             # filtered_df = df.filter([TIME_COL, OXYGEN_COL])
