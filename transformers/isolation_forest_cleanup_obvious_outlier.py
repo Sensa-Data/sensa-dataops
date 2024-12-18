@@ -87,13 +87,12 @@ def transform(data, *args, **kwargs):
                 # logger.info(f"Row {index} is valid: {index}")
                 cleaned_measurement_data.append(row)
             except ValidationError as e:
-                print(row)
+                # print(row)
                 # logger.warning(f"Row {index} validation error:\n{e}")
                 removed_data_count += 1
         
         
         cleaned_data_count = len(cleaned_measurement_data)
-        print(cleaned_data_count)
         cleaned_data = cleaned_data + (
             (
                 pd.DataFrame(cleaned_measurement_data), 
@@ -104,7 +103,6 @@ def transform(data, *args, **kwargs):
             ),
         )
 
-    print(cleaned_data)
     return cleaned_data
 
 

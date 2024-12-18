@@ -27,6 +27,11 @@ def transform(data, *args, **kwargs):
         "WaterQuality": ['Bisulfide', 'CO2', 'Conductivity', 'H2S', 'Nitrate', 'Nitrite', 'Oxygen', 'PH', 'TOCeq', 'Temperature', 'Turbidity', 'UV254f', 'UV254t'],
         "feedingsystem": ['AvgFeedHour'],
     }
+    measurements_tag_columns = {
+        "WaterQuality": ['Equipment', 'Section', 'Subunit', 'Unit', 'Origin'],
+        "feedingsystem": ['Equipment', 'Section', 'Subunit', 'Unit', 'Origin'],
+    }
+
     TIME_COL = 'time'
     MEASURING_UNIT_COL = 'MeasuringUnit'
 
@@ -35,33 +40,45 @@ def transform(data, *args, **kwargs):
 
     for idx, measurement in enumerate(data):
         df, tags, total_data_count, cleaned_data_count, removed_data_count, *_ = measurement
+        if MEASURING_UNIT_COL in tags:
+            tags.remove(MEASURING_UNIT_COL)
+            
         measurement_name = measurements[idx]
         measurement_columns = measurements_field_columns.get(measurement_name)
+        tag_columns = measurements_tag_columns.get(measurement_name)
 
-        # Following existing Influx table naming patter, e.g. Total_Data_Count
-        field_column_unit_aggregation = {
-            "Total_Data_Count": total_data_count,
-            "Cleaned_Data_Count": cleaned_data_count,
-            "Removed_Data_Count": removed_data_count,
-        }
-        field_column_unit_aggregation[TIME_COL] = pd.to_datetime(df[TIME_COL]).mean()
+        aggregated_row_columns = measurement_columns + tag_columns + [TIME_COL, MEASURING_UNIT_COL]
 
-        for field_column_name in measurement_columns:
-            field_column_df = df[[TIME_COL, MEASURING_UNIT_COL, field_column_name]].copy()
-            field_column_df = field_column_df.dropna(subset=[field_column_name])
-            fc_unique_values = field_column_df[MEASURING_UNIT_COL].unique()
+        aggregated_rows = []
+        groups = df.groupby(tag_columns)
+        for (equipment, section, subunit, unit, origin), group_data_df in groups:
+            
+            # Following existing Influx table naming pattern, e.g. Total_Data_Count
+            field_column_unit_aggregation = {
+                "Total_Data_Count": total_data_count,
+                "Cleaned_Data_Count": cleaned_data_count,
+                "Removed_Data_Count": removed_data_count,
+            }
 
-            assert len(fc_unique_values) == 1 # Later we will remove single MeasuringUnit assertion
+            field_column_unit_aggregation[TIME_COL] = pd.to_datetime(group_data_df[TIME_COL]).mean()
+            field_column_unit_aggregation['Equipment'] = equipment
+            field_column_unit_aggregation['Section'] = section
+            field_column_unit_aggregation['Subunit'] = subunit
+            field_column_unit_aggregation['Unit'] = unit
+            field_column_unit_aggregation['Origin'] = origin
 
-            fc_non_null_mean = field_column_df[field_column_name].mean()
-            field_column_unit_aggregation[field_column_name] = [fc_non_null_mean]
-            field_column_unit_aggregation[f"{field_column_name}_Unit"] = fc_unique_values
+            for field_column_name in measurement_columns:
+                field_column_unit_aggregation[field_column_name] = group_data_df[field_column_name].mean()
+                fc_unique_values = group_data_df[[field_column_name, MEASURING_UNIT_COL]].dropna(subset=[field_column_name])[MEASURING_UNIT_COL].unique()
+                assert len(fc_unique_values) <= 1
 
-        single_row_aggregated_df = pd.DataFrame(field_column_unit_aggregation)
-        single_row_aggregated_df.head()
+                field_column_unit_aggregation[f"{field_column_name}_Unit"] = fc_unique_values[0] if len(fc_unique_values) == 1 else ""
 
+            aggregated_rows.append(field_column_unit_aggregation)
         
-        aggregated_data = aggregated_data + ((single_row_aggregated_df, tags),)
+        aggregated_single_row_df = pd.DataFrame(aggregated_rows)
+
+        aggregated_data = aggregated_data + ((aggregated_single_row_df, tags),)
 
     return aggregated_data
 

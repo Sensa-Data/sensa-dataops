@@ -23,7 +23,7 @@ def export_data(data, *args, **kwargs):
     """
     # Specify your data exporting logic here
     org = get_secret_value('biofish_long_write_org')
-    target_bucket = 'biofish_long'
+    target_bucket = 'demofarm_long'
     measurements=["WaterQuality", "feedingsystem"]
 
     with InfluxDBClient3(
@@ -37,7 +37,7 @@ def export_data(data, *args, **kwargs):
             df = measurement_data[0]
             tags = measurement_data[1]
             measurement = measurements[idx]
-            data_frame_measurement_name = f"biofish_{measurement}_min_anomaly"
+            data_frame_measurement_name = f"demofarm_{measurement}_min_anomaly"
             
 
             client.write(
